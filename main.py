@@ -37,8 +37,8 @@ def get_tweet(data):
     war_size = '%s vs %s'%(data['teamSize'], data['teamSize'])
     stars_us = str(data['clan']['stars'])
     stars_them = str(data['opponent']['stars'])
-    dest_us = str(data['clan']['destructionPercentage']) + '%'
-    dest_them = str(data['opponent']['destructionPercentage']) + '%'
+    dest_us = '{0:.1f}'.format(data['clan']['destructionPercentage']) + '%'
+    dest_them = '{0:.1f}'.format(data['opponent']['destructionPercentage']) + '%'
     urllib.request.urlretrieve(data['clan']['badgeUrls']['large'], 'us.png')
     urllib.request.urlretrieve(data['opponent']['badgeUrls']['large'], 'opponent.png')
 
@@ -46,9 +46,10 @@ def get_tweet(data):
     shield_us = shield_us.resize((350, 350), Image.ANTIALIAS)
     shield_opponent = Image.open('opponent.png')
     shield_opponent = shield_opponent.resize((350, 350), Image.ANTIALIAS)
-    
-    box_us = (450, 100, 800, 450)
-    box_opponent = (1120, 100, 1470, 450)
+
+    wid = 1920
+    box_us = (int(wid/3-350/2)-100, 100, int(wid/3+350/2)-100, 450)
+    box_opponent = (int(2*wid/3-350/2)+100, 100, int(2*wid/3+350/2)+100, 450)
 
     background.paste(shield_us, box_us, shield_us)
     background.paste(shield_opponent, box_opponent, shield_opponent)
@@ -56,26 +57,32 @@ def get_tweet(data):
     font = ImageFont.truetype('font.ttf', 100)
     draw = ImageDraw.Draw(background)
     w, h = draw.textsize(result, font = font)
-    draw.text(((1920-w)/2, 500), result, font = font, fill = fill)
-    font = ImageFont.truetype('font.ttf', 60)
+    draw.text(((wid-w)/2, 500), result, font = font, fill = fill)
     
     w, h = draw.textsize('VS', font = font)
-    draw.text(((1920-w)/2, 400), 'VS', font = font, fill = (190,0,0, 255))
+    draw.text(((wid-w)/2, 380), 'VS', font = font, fill = (190,0,0, 255))
+    font = ImageFont.truetype('font.ttf', 60)
 
     w, h = draw.textsize(war_size, font = font)
-    draw.text(((1920-w)/2, 600), war_size, font = font)
+    draw.text(((wid-w)/2, 600), war_size, font = font)
 
-    draw.text((500, 400), data['clan']['name'], font = font)
+    w, h = draw.textsize(data['clan']['name'], font = font)
+    draw.text((int(wid/3-w/2)-100, 400), data['clan']['name'], font = font)
 
-    draw.text((1120, 400), data['opponent']['name'], font = font)
+    w, h = draw.textsize(data['opponent']['name'], font = font)
+    draw.text((int(2*wid/3-w/2)+100, 400), data['opponent']['name'], font = font)
 
-    stars = '%s*                    %s*'%(stars_us, stars_them)
-    w, h = draw.textsize(stars, font = font)
-    draw.text(((1920-w)/2, 700), stars, font = font)
+    w, h = draw.textsize(stars_us + '*', font = font)
+    draw.text((int(wid/3-w/2)-100, 700), stars_us + '*', font = font)
+
+    w, h = draw.textsize(stars_them + '*', font = font)
+    draw.text((int(2*wid/3-w/2)+100, 700), stars_them + '*', font = font)
     
-    dest = '%s                    %s'%(dest_us, dest_them)
-    w, h = draw.textsize(dest, font = font)
-    draw.text(((1920-w)/2, 800), dest, font = font)
+    w, h = draw.textsize(dest_us, font = font)
+    draw.text((int(wid/3-w/2)-100, 800), dest_us, font = font)
+
+    w, h = draw.textsize(dest_them, font = font)
+    draw.text((int(2*wid/3-w/2)+100, 800), dest_them, font = font)
 
     trademark = 'this action was performed automatically by a bot (created by @Juiced_Box)'
     font = ImageFont.truetype('font.ttf', 40)
